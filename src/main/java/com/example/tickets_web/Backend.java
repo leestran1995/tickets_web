@@ -46,18 +46,27 @@ public class Backend {
      * @param ticket The data of the ticket itself
      * @return True if valid, False if invalid
      */
-    @RequestMapping("/verify_tickets/{event}/{ticket}")
+    @RequestMapping("/verify_tickets/{username}/{event}/{ticket}")
     public static boolean verifyTicket(@PathVariable("event") String eventName,
                                         @PathVariable("username") String username,
                                         @PathVariable("ticket") byte[] ticket){
-        Ticket[] tickets = readTicketFile(username, eventName);
-        for (Ticket tic : tickets) {
-            if (tic.validateTicket(ticket)) {
-                saveTicketArrayToFile(eventName, tickets);
-                return true;
-            }
-        }
-        return false;
+        Event currentEvent = readEventFromFile(username, eventName);
+        return currentEvent.verifyTicket(ticket);
+    }
+
+    /**
+     * Verify the refunding of a single ticket.
+     * @param username  Name of the user that generated the tickets for the event
+     * @param eventname Name of the event the ticket is being used for
+     * @param ticket The data of the ticket itself
+     * @return True if valid, False if invalid
+     */
+    @RequestMapping("refund_ticket/{username}/{event}/{ticket}")
+    public static boolean refundTicket(@PathVariable("username") String username,
+                                       @PathVariable("event") String eventname,
+                                       @PathVariable("ticket") byte[] ticket) {
+        Event currentEvent = readEventFromFile(username, eventname);
+        return currentEvent.refundTicket(ticket);
     }
 
 
@@ -180,6 +189,27 @@ public class Backend {
             System.out.println("Error reading from file: " + e.toString());
         } catch (ClassNotFoundException c) {
             System.out.println("Error: " + c.toString());
+        }
+        return null;    // I think maybe this is dangerous
+    }
+
+    /**
+     * Get the stored event object from a file.
+     * @param username Name of the user who is directing the server to read the file
+     * @param eventName Name of the event that is having its tickets get read
+     * @return The event object
+     */
+    private static Event readEventFromFile(String username, String eventName) {
+        try {
+            String filePath = "Ticket_Database/" + username + "/" + eventName;
+            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(filePath));
+            return (Event) inputStream.readObject();
+        } catch (IOException e) {
+            System.out.println("Error reading from file: " + e.toString());
+            e.printStackTrace();
+        } catch (ClassNotFoundException c) {
+            System.out.println("Error: " + c.toString());
+            c.printStackTrace();
         }
         return null;    // I think maybe this is dangerous
     }
