@@ -40,13 +40,13 @@ public class Backend {
      * If the ticket is in the database, return true. Otherwise return false
      */
     @RequestMapping("/verify_tickets/{event}/{ticket}")
-    private static boolean verifyTicket(@PathVariable("event") String event_name,
+    private static boolean verifyTicket(@PathVariable("event") String eventName,
                                         @PathVariable("ticket") byte[] ticket,
                                         @PathVariable("username") String username){
-        Ticket[] tickets = readTicketFile(username, event_name);
+        Ticket[] tickets = readTicketFile(username, eventName);
         for (Ticket tic : tickets) {
             if (tic.validateTicket(ticket)) {
-                saveTicketArrayToFile(event_name, tickets);
+                saveTicketArrayToFile(eventName, tickets);
                 return true;
             }
         }
@@ -121,14 +121,14 @@ public class Backend {
 
     @RequestMapping("/create_tickets/{password}/{num_tickets}/{username}")
     public static String createAndSavesTickets(@PathVariable("password") String password,
-                                               @PathVariable("event_name") String event_name,
+                                               @PathVariable("eventName") String eventName,
                                              @PathVariable("num_tickets") int numTickets,
                                              @PathVariable("username") String username) {
 
         String directory_path = "Ticket_Database/" + username;
         boolean make_dirs = (new File(directory_path).mkdirs());
 
-        String outputPath = directory_path + "/" + event_name;
+        String outputPath = directory_path + "/" + eventName;
         Ticket[] tickets = createTicketHashes(password, numTickets);
         if(saveTicketArrayToFile(outputPath, tickets)) {
            return "Successfully created tickets";
@@ -138,10 +138,10 @@ public class Backend {
         }
     }
 
-    public static Ticket[] readTicketFile(String username, String event_name) {
+    public static Ticket[] readTicketFile(String username, String eventName) {
         try {
-            String file_path = "Ticket_Database/" + username + "/" + event_name;
-            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file_path));
+            String filePath = "Ticket_Database/" + username + "/" + eventName;
+            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(filePath));
             return (Ticket[]) inputStream.readObject();
         } catch (IOException e) {
             System.out.println("Error reading from file: " + e.toString());
