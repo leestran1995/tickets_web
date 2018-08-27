@@ -144,6 +144,24 @@ public class Backend {
     }
 
     /**
+     * Write an Event object to a file to use later.
+     * @param outputPath Path to save the event to
+     * @param eventToWrite The Event object we're writing
+     * @return True if the file was written successfully, false otherwise.
+     */
+    private static boolean saveEventToFile(String outputPath, Event eventToWrite) {
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(outputPath));
+            outputStream.writeObject(eventToWrite);
+            outputStream.close();
+        } catch (IOException e) {
+            System.out.println("Error writing to file: " + e.toString());
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Create and save tickets
      * <p>
      *     Given a password, event name, number, and a username, create a set of tickets for that
@@ -166,7 +184,9 @@ public class Backend {
 
         String outputPath = directory_path + "/" + eventName;
         Ticket[] tickets = createTicketHashes(password, numTickets);
-        if(saveTicketArrayToFile(outputPath, tickets)) {
+        Event newEvent = new Event(eventName, numTickets, tickets);
+
+        if(saveEventToFile(outputPath, newEvent)) {
            return "Successfully created tickets";
         }
         else {
@@ -221,7 +241,13 @@ public class Backend {
 
     public static void main(String[] args) {
         createAndSavesTickets("Hello", "concert", 5, "First Ave");
-        Ticket[] tickets = readTicketFile("First Ave", "concert");
-        byte[] hash = tickets[0].getHash();
+        Event currentEvent = readEventFromFile("First Ave", "concert");
+        System.out.println("Tickets sold: " + currentEvent.getTicketsSold());
+        try {
+            Ticket tic = currentEvent.getNextUnsoldTicket();
+        } catch (Exceptions.NoTicketsAvailableException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Tickets sold: " + currentEvent.getTicketsSold());
     }
 }

@@ -1,11 +1,13 @@
 package com.example.tickets_web;
 
+import java.io.Serializable;
+
 /**
  * This class represents all of the data for a single event a user would
  * use. It will store the tickets for itself, track how many tickets have been created, and generate
  * new tickets for the event.
  */
-public class Event {
+public class Event implements Serializable {
     private String eventName;
 
     private int totalNumTickets;
@@ -30,6 +32,10 @@ public class Event {
 
     public int getTotalNumTickets() {
         return totalNumTickets;
+    }
+
+    public int getTicketsSold() {
+        return ticketsSold;
     }
 
     /**
