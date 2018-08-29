@@ -7,4 +7,8 @@ public class Exceptions {
             super(message);
         }
     }
+
+    public static class EventNotFoundException extends Exception {
+        public EventNotFoundException(String message) { super(message); }
+    }
 }
