@@ -1,7 +1,9 @@
 package com.example.tickets_web;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
+import com.example.tickets_web.Backend;
 /**
  * This class represents all of the data for a single event a user would
  * use. It will store the tickets for itself, track how many tickets have been created, and generate
@@ -89,5 +91,27 @@ public class Event implements Serializable {
             }
         }
         return false;
+    }
+
+    public void addTickets(int numNewTickets, String password) throws Exceptions.BadPasswordException {
+        String concatPass = password + "0";
+        byte[] hash = Backend.createHashFromPassword(concatPass);
+        Ticket testTicket = tickets[0];
+        if(!(hash == testTicket.getHash())) {
+            throw new Exceptions.BadPasswordException("Bad password given");
+        }
+
+        int newSize = numNewTickets + totalNumTickets;
+        Ticket[] newTicketBase = new Ticket[newSize];
+        Ticket[] newTickets = Backend.createTicketHashes(password, numNewTickets, totalNumTickets);
+
+        // Copy old tickets
+        System.arraycopy(tickets, 0, newTicketBase, 0, totalNumTickets);
+        // Copy new tickets
+        for(int i = totalNumTickets; i < newSize; i++) {
+            newTicketBase[i] = newTickets[totalNumTickets - i];
+        }
+        tickets = newTicketBase;
+        totalNumTickets = newSize;
     }
 }
