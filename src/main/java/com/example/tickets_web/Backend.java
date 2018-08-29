@@ -84,8 +84,6 @@ public class Backend {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             byte[] digest = messageDigest.digest(data1);
 
-            System.out.println(Arrays.toString(digest));
-
             return digest;
         } catch (IOException e) {
             System.out.println("Unknown encoding");
@@ -129,16 +127,14 @@ public class Backend {
      * @param eventToWrite The Event object we're writing
      * @return True if the file was written successfully, false otherwise.
      */
-    private static boolean saveEventToFile(String outputPath, Event eventToWrite) {
+    private static void saveEventToFile(String outputPath, Event eventToWrite) {
         try {
             ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(outputPath));
             outputStream.writeObject(eventToWrite);
             outputStream.close();
         } catch (IOException e) {
             System.out.println("Error writing to file: " + e.toString());
-            return false;
         }
-        return true;
     }
 
     /**
@@ -154,10 +150,10 @@ public class Backend {
      * @return a string indicating whether the tickets were created and saved properly
      */
     @RequestMapping("/create_tickets/{password}/{num_tickets}/{username}")
-    public static String createAndSavesTickets(@PathVariable("password") String password,
+    public static Event createAndSaveTickets(@PathVariable("password") String password,
                                                @PathVariable("eventName") String eventName,
                                              @PathVariable("num_tickets") int numTickets,
-                                             @PathVariable("username") String username) {
+                                             @PathVariable("username") String username){
 
         String directory_path = "Ticket_Database/" + username;
         boolean make_dirs = (new File(directory_path).mkdirs());
@@ -165,13 +161,8 @@ public class Backend {
         String outputPath = directory_path + "/" + eventName;
         Ticket[] tickets = createTicketHashes(password, numTickets);
         Event newEvent = new Event(eventName, numTickets, tickets);
+        return newEvent;
 
-        if(saveEventToFile(outputPath, newEvent)) {
-           return "Successfully created tickets";
-        }
-        else {
-            return "Error while trying to create ticket file";
-        }
     }
 
 
@@ -202,7 +193,7 @@ public class Backend {
     }
 
     public static void main(String[] args) {
-        createAndSavesTickets("Hello", "concert", 5, "First Ave");
+        createAndSaveTickets("Hello", "concert", 5, "First Ave");
         Event currentEvent = readEventFromFile("First Ave", "concert");
         System.out.println("Tickets sold: " + currentEvent.getTicketsSold());
         try {
