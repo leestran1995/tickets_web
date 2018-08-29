@@ -15,4 +15,8 @@ public class Exceptions {
     public static class EventNotFoundException extends Exception {
         public EventNotFoundException(String message) { super(message); }
     }
+
+    public static class BadPasswordException extends  Exception {
+        public BadPasswordException(String message) { super(message); }
+    }
 }

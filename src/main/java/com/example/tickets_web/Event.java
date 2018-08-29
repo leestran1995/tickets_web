@@ -97,7 +97,7 @@ public class Event implements Serializable {
         String concatPass = password + "0";
         byte[] hash = Backend.createHashFromPassword(concatPass);
         Ticket testTicket = tickets[0];
-        if(!(hash == testTicket.getHash())) {
+        if(!Arrays.equals(hash, testTicket.getHash())) {
             throw new Exceptions.BadPasswordException("Bad password given");
         }
 
@@ -108,8 +108,8 @@ public class Event implements Serializable {
         // Copy old tickets
         System.arraycopy(tickets, 0, newTicketBase, 0, totalNumTickets);
         // Copy new tickets
-        for(int i = totalNumTickets; i < newSize; i++) {
-            newTicketBase[i] = newTickets[totalNumTickets - i];
+        for(int i = totalNumTickets; i < newSize-1; i++) {
+            newTicketBase[i] = newTickets[i - totalNumTickets];
         }
         tickets = newTicketBase;
         totalNumTickets = newSize;

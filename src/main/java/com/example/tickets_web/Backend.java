@@ -77,7 +77,7 @@ public class Backend {
      * @param password The key to create the ticket hashes, never saved.
      * @return a byte[] array that represents the single ticket
      */
-    private static byte[] createHashFromPassword(String password) {
+    public static byte[] createHashFromPassword(String password) {
         try {
             byte[] data1 = password.getBytes("UTF-8");
 
@@ -99,7 +99,7 @@ public class Backend {
      * @param numTickets The number of tickets to be created
      * @return the array of tickets
      */
-    private static Ticket[] createTicketHashes(String password, int numTickets) {
+    public static Ticket[] createTicketHashes(String password, int numTickets, int startNum) {
         Ticket[] tickets = new Ticket[numTickets];
         for (int i = 0; i < numTickets; i++) {
             String iteratedPassword = password + i;
@@ -159,7 +159,7 @@ public class Backend {
         boolean make_dirs = (new File(directory_path).mkdirs());
 
         String outputPath = directory_path + "/" + eventName;
-        Ticket[] tickets = createTicketHashes(password, numTickets);
+        Ticket[] tickets = createTicketHashes(password, numTickets, 0);
         Event newEvent = new Event(eventName, numTickets, tickets);
         return newEvent;
 
